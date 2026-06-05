@@ -121,16 +121,25 @@ The product should feel fast, calm, and reliable for everyday use, with a strong
 
 - Users must be able to update quantity in stock for a yarn record.
 - The system must prevent invalid quantity states (for example negative amounts).
+- The system must support decimal skein quantities.
 - Quantity changes must be persisted and reflected immediately in the UI.
 - The system should provide clear error feedback if quantity persistence fails.
 
-### FR-7: Persistence and Data Reliability
+### FR-7: Inventory Calculation Rules
+
+- Users may store full or partial skeins.
+- Per-skein measurements are optional.
+- Total inventory measurements are editable.
+- Editing a total measurement recalculates related totals when enough information exists.
+- Total values are considered the source of truth after manual edits.
+
+### FR-8: Persistence and Data Reliability
 
 - Inventory changes must persist across application restarts.
 - The system must prevent silent data loss during normal user flows.
 - On persistence failures, the user must receive clear recovery guidance.
 
-### FR-8: Core UX States
+### FR-9: Core UX States
 
 - The system must present explicit loading, empty, success, and error states for async actions.
 - Validation messages must be actionable and specific.
