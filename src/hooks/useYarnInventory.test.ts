@@ -105,4 +105,52 @@ describe('useYarnInventory persistence', () => {
     expect(reloaded?.handDyed).toBe(!existing!.handDyed)
     expect(reloaded?.superwash).toBe(!existing!.superwash)
   })
+
+  it('keeps existing data unchanged and exposes clear error when edit save fails', async () => {
+    const repository: InventoryRepository = {
+      async load() {
+        return [] as never
+      },
+      async save() {
+        throw new Error('write failed')
+      },
+    }
+
+    const hook = renderHook(() => useYarnInventory(repository))
+
+    await waitFor(() => {
+      expect(hook.result.current.isLoading).toBe(false)
+    })
+
+    const existing = hook.result.current.records[0]
+    expect(existing).toBeDefined()
+
+    const before = JSON.parse(
+      JSON.stringify(hook.result.current.records)
+    ) as typeof hook.result.current.records
+
+    let result = false
+
+    await act(async () => {
+      result = await hook.result.current.updateRecordFromDraft(existing!.id, {
+        imageUrl: existing?.imageUrl ?? '',
+        maker: 'Failed Save Maker',
+        yarnName: existing!.yarnName,
+        yardage: String(existing!.totalYardage ?? 0),
+        meters: String(existing!.totalMeters ?? 0),
+        grams: String(existing!.totalGrams ?? 0),
+        weightCategory: existing!.weightCategory,
+        materialType: existing!.materialType,
+        quantityInStock: String(existing!.quantityInStock),
+        handDyed: existing!.handDyed,
+        superwash: existing!.superwash,
+        archived: existing!.archived,
+      })
+    })
+
+    expect(result).toBe(false)
+    expect(hook.result.current.operationError).toBe('Saving failed. Please try again.')
+    expect(hook.result.current.statusMessage).toBeNull()
+    expect(hook.result.current.records).toEqual(before)
+  })
 })
