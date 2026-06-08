@@ -1,0 +1,17 @@
+.app-shell {
+  max-width: 48rem;
+  margin: 3rem auto;
+  padding: 0 1.25rem;
+}
+
+.app-shell h1 {
+  margin: 0 0 0.75rem;
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
+.app-shell p {
+  margin: 0;
+  line-height: 1.5;
+  color: #354255;
+}

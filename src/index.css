@@ -1,0 +1,17 @@
+:root {
+  font-family: 'Atkinson Hyperlegible', 'Segoe UI', Tahoma, sans-serif;
+  color: #1f2937;
+  background-color: #f8fafc;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
