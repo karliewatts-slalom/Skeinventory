@@ -38,7 +38,7 @@ describe('App', () => {
     await user.click(
       await screen.findByRole('button', { name: /add new skeinventory/i })
     )
-    await user.type(screen.getByLabelText(/maker/i), 'Test Maker')
+    await user.type(screen.getByLabelText(/^maker \*$/i), 'Test Maker')
     await user.type(screen.getByLabelText(/yarn name/i), 'Test Yarn')
     await user.clear(screen.getByLabelText(/yardage/i))
     await user.type(screen.getByLabelText(/yardage/i), '300')
@@ -52,7 +52,12 @@ describe('App', () => {
     await user.click(screen.getByRole('button', { name: /add skeinventory/i }))
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
-    expect(screen.getByText('Test Maker')).toBeInTheDocument()
+    const inventoryList = await screen.findByRole('region', {
+      name: /yarn inventory list/i,
+    })
+    expect(
+      within(inventoryList).getByText('Test Maker', { selector: 'p.card-maker' })
+    ).toBeInTheDocument()
     expect(screen.getByRole('status')).toHaveTextContent(/added successfully/i)
   })
 
@@ -66,7 +71,7 @@ describe('App', () => {
       await screen.findByRole('button', { name: /add new skeinventory/i })
     )
     await user.type(screen.getByLabelText(/image \(optional\)/i), 'https://example.com/rios.jpg')
-    await user.type(screen.getByLabelText(/maker/i), 'Image Maker')
+    await user.type(screen.getByLabelText(/^maker \*$/i), 'Image Maker')
     await user.type(screen.getByLabelText(/yarn name/i), 'Image Yarn')
     await user.type(screen.getByLabelText(/material type/i), 'Wool')
     await user.click(screen.getByRole('button', { name: /add skeinventory/i }))
@@ -91,7 +96,14 @@ describe('App', () => {
     await user.click(screen.getByRole('button', { name: /save changes/i }))
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
-    expect(screen.getByText('Updated Maker')).toBeInTheDocument()
+    const inventoryList = await screen.findByRole('region', {
+      name: /yarn inventory list/i,
+    })
+    expect(
+      within(inventoryList).getByText('Updated Maker', {
+        selector: 'p.card-maker',
+      })
+    ).toBeInTheDocument()
     expect(screen.getByText('Updated Yarn')).toBeInTheDocument()
     expect(screen.getByText('Updated Material')).toBeInTheDocument()
     expect(screen.getByRole('status')).toHaveTextContent(
@@ -146,7 +158,7 @@ describe('App', () => {
       await screen.findByRole('button', { name: /add new skeinventory/i })
     )
 
-    await user.type(screen.getByLabelText(/maker/i), 'Maker')
+    await user.type(screen.getByLabelText(/^maker \*$/i), 'Maker')
     await user.type(screen.getByLabelText(/yarn name/i), 'Name')
     await user.type(screen.getByLabelText(/material type/i), 'Wool')
     await user.clear(screen.getByLabelText(/yardage/i))
@@ -362,6 +374,81 @@ describe('App', () => {
 
     expect(screen.getByRole('heading', { name: /wool-ease/i })).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: /rios/i })).not.toBeInTheDocument()
+  })
+
+  it('applies combinable attribute filters and clear restores default active view', async () => {
+    localStorage.clear()
+
+    const user = userEvent.setup()
+    render(<App />)
+
+    const worstedCheckbox = screen.getByRole('checkbox', { name: /worsted/i })
+    const handDyedGroup = screen.getByRole('group', { name: /^hand dyed$/i })
+    const handDyedYes = within(handDyedGroup).getByRole('button', {
+      name: /^yes$/i,
+    })
+    const makerSelect = screen.getByLabelText(/select maker/i)
+
+    await user.click(worstedCheckbox)
+    await user.click(handDyedYes)
+    await user.selectOptions(makerSelect, 'Malabrigo')
+
+    expect(screen.getByRole('heading', { name: /rios/i })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('heading', { name: /220 superwash/i })
+    ).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /clear filters/i }))
+
+    expect(screen.getByRole('heading', { name: /rios/i })).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: /220 superwash/i })
+    ).toBeInTheDocument()
+  })
+
+  it('shows no-results message when attribute filters exclude all records', async () => {
+    localStorage.clear()
+
+    const user = userEvent.setup()
+    render(<App />)
+
+    await screen.findByRole('heading', { name: /rios/i })
+
+    const makerSelect = screen.getByLabelText(/select maker/i)
+    const handDyedGroup = screen.getByRole('group', { name: /^hand dyed$/i })
+    const handDyedYes = within(handDyedGroup).getByRole('button', {
+      name: /^yes$/i,
+    })
+
+    await user.selectOptions(makerSelect, 'Cascade')
+    await user.click(handDyedYes)
+
+    expect(screen.getByText('No results match your search')).toBeInTheDocument()
+  })
+
+  it('applies attribute filters within archived view mode', async () => {
+    localStorage.clear()
+
+    const user = userEvent.setup()
+    render(<App />)
+
+    await screen.findByRole('heading', { name: /rios/i })
+
+    const inventoryViewToggle = screen.getByRole('group', {
+      name: /inventory view/i,
+    })
+    await user.click(
+      within(inventoryViewToggle).getByRole('button', { name: /archived/i })
+    )
+
+    const worstedCheckbox = screen.getByRole('checkbox', { name: /worsted/i })
+    await user.click(worstedCheckbox)
+
+    expect(screen.getByRole('heading', { name: /wool-ease/i })).toBeInTheDocument()
+
+    await user.click(worstedCheckbox)
+    await user.click(screen.getByRole('checkbox', { name: /^dk$/i }))
+    expect(screen.getByText('No results match your search')).toBeInTheDocument()
   })
 
   it('deletes a record after confirmation and removes it from the list', async () => {

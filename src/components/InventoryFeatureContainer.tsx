@@ -5,12 +5,20 @@ import { useYarnEditor } from '../hooks/useYarnEditor'
 import { useYarnInventory } from '../hooks/useYarnInventory'
 import { useState } from 'react'
 import { filterInventory } from '../services/inventorySearch'
+import {
+  DEFAULT_INVENTORY_ATTRIBUTE_FILTERS,
+  filterByAttributes,
+} from '../services/inventoryFilters'
+import type { WeightCategory } from '../types/yarn'
 
 type InventoryViewMode = 'active' | 'archived'
 
 export const InventoryFeatureContainer = () => {
   const [viewMode, setViewMode] = useState<InventoryViewMode>('active')
   const [searchQuery, setSearchQuery] = useState('')
+  const [attributeFilters, setAttributeFilters] = useState(
+    DEFAULT_INVENTORY_ATTRIBUTE_FILTERS
+  )
   const {
     records,
     statusMessage,
@@ -38,7 +46,15 @@ export const InventoryFeatureContainer = () => {
   const viewFilteredRecords = records.filter((record) =>
     viewMode === 'active' ? !record.archived : record.archived
   )
-  const visibleRecords = filterInventory(viewFilteredRecords, searchQuery)
+  const searchFilteredRecords = filterInventory(viewFilteredRecords, searchQuery)
+  const visibleRecords = filterByAttributes(
+    searchFilteredRecords,
+    attributeFilters
+  )
+
+  const makerOptions = Array.from(new Set(records.map((record) => record.maker))).sort(
+    (left, right) => left.localeCompare(right)
+  )
 
   const emptyStateVariant =
     records.length === 0
@@ -54,7 +70,36 @@ export const InventoryFeatureContainer = () => {
       </header>
 
       <div className="app-body">
-        <InventoryFilters />
+        <InventoryFilters
+          filters={attributeFilters}
+          makerOptions={makerOptions}
+          onWeightCategoryToggle={(value: WeightCategory) => {
+            setAttributeFilters((current) => {
+              const hasValue = current.weightCategories.includes(value)
+
+              return {
+                ...current,
+                weightCategories: hasValue
+                  ? current.weightCategories.filter(
+                      (category) => category !== value
+                    )
+                  : [...current.weightCategories, value],
+              }
+            })
+          }}
+          onMakerChange={(value) => {
+            setAttributeFilters((current) => ({ ...current, maker: value }))
+          }}
+          onHandDyedChange={(value) => {
+            setAttributeFilters((current) => ({ ...current, handDyed: value }))
+          }}
+          onSuperwashChange={(value) => {
+            setAttributeFilters((current) => ({ ...current, superwash: value }))
+          }}
+          onClear={() => {
+            setAttributeFilters(DEFAULT_INVENTORY_ATTRIBUTE_FILTERS)
+          }}
+        />
 
         <main className="inventory-area">
           {operationError && (
