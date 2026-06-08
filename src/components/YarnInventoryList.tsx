@@ -37,7 +37,11 @@ export const YarnInventoryList = ({
   onDelete,
 }: YarnInventoryListProps) => {
   if (isLoading) {
-    return <p className="inventory-state">Loading inventory...</p>
+    return (
+      <p className="inventory-state" role="status" aria-live="polite">
+        Loading inventory...
+      </p>
+    )
   }
 
   if (records.length === 0) {

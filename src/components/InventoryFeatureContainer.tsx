@@ -104,7 +104,7 @@ export const InventoryFeatureContainer = () => {
         <main className="inventory-area">
           {operationError && (
             <p className="submit-error" role="alert">
-              {operationError}
+              {operationError} Please retry the action.
             </p>
           )}
           {statusMessage && (

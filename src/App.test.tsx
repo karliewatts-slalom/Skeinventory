@@ -17,6 +17,17 @@ describe('App', () => {
     ).toBeInTheDocument()
   })
 
+  it('shows explicit loading state while inventory is being fetched', async () => {
+    localStorage.clear()
+
+    render(<App />)
+
+    expect(screen.getByRole('status')).toHaveTextContent(/loading inventory/i)
+    expect(
+      await screen.findByRole('heading', { name: /rios/i })
+    ).toBeInTheDocument()
+  })
+
   it('prevents invalid submit and shows inline errors', async () => {
     const user = userEvent.setup()
     render(<App />)

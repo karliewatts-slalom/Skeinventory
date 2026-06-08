@@ -375,4 +375,36 @@ describe('useYarnInventory persistence', () => {
       'We could not load saved inventory.'
     )
   })
+
+  it('surfaces clear recovery guidance when save fails', async () => {
+    const repository: InventoryRepository = {
+      async load() {
+        return cloneSampleRecords() as never
+      },
+      async save() {
+        throw new Error('write failed')
+      },
+    }
+
+    const hook = renderHook(() => useYarnInventory(repository))
+
+    await waitFor(() => {
+      expect(hook.result.current.isLoading).toBe(false)
+    })
+
+    let result = false
+
+    await act(async () => {
+      result = await hook.result.current.createRecordFromDraft({
+        ...DEFAULT_CREATE_YARN_DRAFT,
+        maker: 'Failure Maker',
+        yarnName: 'Failure Yarn',
+        materialType: 'Wool',
+      })
+    })
+
+    expect(result).toBe(false)
+    expect(hook.result.current.operationError).toBe('Saving failed. Please try again.')
+    expect(hook.result.current.statusMessage).toBeNull()
+  })
 })
