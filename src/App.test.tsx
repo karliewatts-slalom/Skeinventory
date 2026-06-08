@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
+import { vi } from 'vitest'
 import App from './App'
 
 describe('App', () => {
@@ -81,8 +82,8 @@ describe('App', () => {
     const editButtons = await screen.findAllByRole('button', { name: /edit/i })
     expect(editButtons.length).toBeGreaterThan(0)
     await user.click(editButtons[0]!)
-    await user.clear(screen.getByLabelText(/maker/i))
-    await user.type(screen.getByLabelText(/maker/i), 'Updated Maker')
+    await user.clear(screen.getByLabelText(/^maker \*$/i))
+    await user.type(screen.getByLabelText(/^maker \*$/i), 'Updated Maker')
     await user.clear(screen.getByLabelText(/yarn name/i))
     await user.type(screen.getByLabelText(/yarn name/i), 'Updated Yarn')
     await user.clear(screen.getByLabelText(/material type/i))
@@ -297,5 +298,64 @@ describe('App', () => {
       within(inventoryViewToggle).getByRole('button', { name: /active/i })
     )
     expect(screen.getByRole('heading', { name: /wool-ease/i })).toBeInTheDocument()
+  })
+
+  it('deletes a record after confirmation and removes it from the list', async () => {
+    localStorage.clear()
+
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
+
+    const user = userEvent.setup()
+    render(<App />)
+
+    const inventoryList = await screen.findByRole('region', {
+      name: /yarn inventory list/i,
+    })
+
+    const riosCard = within(inventoryList)
+      .getByRole('heading', { name: /rios/i })
+      .closest('article')
+    expect(riosCard).not.toBeNull()
+
+    await user.click(
+      within(riosCard as HTMLElement).getByRole('button', {
+        name: /delete malabrigo rios/i,
+      })
+    )
+
+    expect(confirmSpy).toHaveBeenCalled()
+    expect(screen.queryByRole('heading', { name: /rios/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent(/deleted successfully/i)
+
+    confirmSpy.mockRestore()
+  })
+
+  it('keeps a record when delete confirmation is cancelled', async () => {
+    localStorage.clear()
+
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false)
+
+    const user = userEvent.setup()
+    render(<App />)
+
+    const inventoryList = await screen.findByRole('region', {
+      name: /yarn inventory list/i,
+    })
+
+    const riosCard = within(inventoryList)
+      .getByRole('heading', { name: /rios/i })
+      .closest('article')
+    expect(riosCard).not.toBeNull()
+
+    await user.click(
+      within(riosCard as HTMLElement).getByRole('button', {
+        name: /delete malabrigo rios/i,
+      })
+    )
+
+    expect(confirmSpy).toHaveBeenCalled()
+    expect(screen.getByRole('heading', { name: /rios/i })).toBeInTheDocument()
+
+    confirmSpy.mockRestore()
   })
 })

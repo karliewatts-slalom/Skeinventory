@@ -6,6 +6,7 @@ interface YarnInventoryListProps {
   onEdit: (record: Yarn) => void
   onArchive: (recordId: string) => void
   onRestore: (recordId: string) => void
+  onDelete: (recordId: string) => void
 }
 
 const formatQuantity = (value: number): string =>
@@ -31,6 +32,7 @@ export const YarnInventoryList = ({
   onEdit,
   onArchive,
   onRestore,
+  onDelete,
 }: YarnInventoryListProps) => {
   if (isLoading) {
     return <p className="inventory-state">Loading inventory...</p>
@@ -52,6 +54,15 @@ export const YarnInventoryList = ({
           className={`inventory-card ${record.archived ? 'is-archived' : ''}`}
           key={record.id}
         >
+          <button
+            type="button"
+            className="card-delete-button"
+            aria-label={`Delete ${record.maker} ${record.yarnName}`}
+            onClick={() => onDelete(record.id)}
+          >
+            🗑
+          </button>
+
           {record.archived && (
             <span className="archived-pill" aria-label="Archived">
               Archived

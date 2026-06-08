@@ -18,6 +18,7 @@ export const InventoryFeatureContainer = () => {
     updateRecordFromDraft,
     archiveRecord,
     restoreRecord,
+    deleteRecord,
   } = useYarnInventory()
   const {
     isOpen,
@@ -81,6 +82,17 @@ export const InventoryFeatureContainer = () => {
             }}
             onRestore={(recordId) => {
               void restoreRecord(recordId)
+            }}
+            onDelete={(recordId) => {
+              const shouldDelete = window.confirm(
+                'Delete this yarn record? This action cannot be undone.'
+              )
+
+              if (!shouldDelete) {
+                return
+              }
+
+              void deleteRecord(recordId)
             }}
           />
         </main>

@@ -22,6 +22,7 @@ interface UseYarnInventoryResult {
   ) => Promise<boolean>
   archiveRecord: (id: string) => Promise<boolean>
   restoreRecord: (id: string) => Promise<boolean>
+  deleteRecord: (id: string) => Promise<boolean>
 }
 
 export const useYarnInventory = (
@@ -177,6 +178,23 @@ export const useYarnInventory = (
     }
   }
 
+  const deleteRecord = async (id: string): Promise<boolean> => {
+    setOperationError(null)
+    setStatusMessage(null)
+
+    const nextRecords = records.filter((record) => record.id !== id)
+
+    try {
+      await repository.save(nextRecords)
+      setRecords(nextRecords)
+      setStatusMessage('Yarn record deleted successfully.')
+      return true
+    } catch {
+      setOperationError('Deleting failed. Please try again.')
+      return false
+    }
+  }
+
   return {
     records,
     isLoading,
@@ -186,5 +204,6 @@ export const useYarnInventory = (
     updateRecordFromDraft,
     archiveRecord,
     restoreRecord,
+    deleteRecord,
   }
 }

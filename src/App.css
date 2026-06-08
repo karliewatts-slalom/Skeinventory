@@ -137,6 +137,29 @@
   padding: 0.2rem 0.55rem;
 }
 
+.card-delete-button {
+  position: absolute;
+  top: 0.65rem;
+  left: 0.65rem;
+  z-index: 1;
+  border: 1px solid #cfcfd2;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #5f1825;
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.card-delete-button:focus-visible {
+  outline: 2px solid #17171a;
+  outline-offset: 2px;
+}
+
 .inventory-card.is-archived {
   opacity: 0.65;
 }

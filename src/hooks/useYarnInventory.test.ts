@@ -274,4 +274,79 @@ describe('useYarnInventory persistence', () => {
     expect(hook.result.current.statusMessage).toBeNull()
     expect(hook.result.current.records).toEqual(before)
   })
+
+  it('deletes a record and persists removal across reloads', async () => {
+    let persisted: unknown[] = []
+
+    const repository: InventoryRepository = {
+      async load() {
+        return persisted as never
+      },
+      async save(records) {
+        persisted = JSON.parse(JSON.stringify(records)) as unknown[]
+      },
+    }
+
+    const firstMount = renderHook(() => useYarnInventory(repository))
+
+    await waitFor(() => {
+      expect(firstMount.result.current.isLoading).toBe(false)
+    })
+
+    const existing = firstMount.result.current.records[0]
+    expect(existing).toBeDefined()
+
+    await act(async () => {
+      await firstMount.result.current.deleteRecord(existing!.id)
+    })
+
+    firstMount.unmount()
+
+    const secondMount = renderHook(() => useYarnInventory(repository))
+
+    await waitFor(() => {
+      expect(secondMount.result.current.isLoading).toBe(false)
+    })
+
+    const reloaded = secondMount.result.current.records.find(
+      (record) => record.id === existing!.id
+    )
+
+    expect(reloaded).toBeUndefined()
+  })
+
+  it('keeps existing data unchanged and exposes clear error when delete save fails', async () => {
+    const repository: InventoryRepository = {
+      async load() {
+        return [] as never
+      },
+      async save() {
+        throw new Error('write failed')
+      },
+    }
+
+    const hook = renderHook(() => useYarnInventory(repository))
+
+    await waitFor(() => {
+      expect(hook.result.current.isLoading).toBe(false)
+    })
+
+    const existing = hook.result.current.records[0]
+    expect(existing).toBeDefined()
+
+    const before = JSON.parse(
+      JSON.stringify(hook.result.current.records)
+    ) as typeof hook.result.current.records
+
+    let result = false
+
+    await act(async () => {
+      result = await hook.result.current.deleteRecord(existing!.id)
+    })
+
+    expect(result).toBe(false)
+    expect(hook.result.current.operationError).toBe('Deleting failed. Please try again.')
+    expect(hook.result.current.statusMessage).toBeNull()
+    expect(hook.result.current.records).toEqual(before)
+  })
 })
