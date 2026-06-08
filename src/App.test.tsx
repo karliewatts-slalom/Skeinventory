@@ -98,6 +98,45 @@ describe('App', () => {
     )
   })
 
+  it('updates quantity and immediately reflects the new value in the UI', async () => {
+    localStorage.clear()
+
+    const user = userEvent.setup()
+    render(<App />)
+
+    const inventoryList = await screen.findByRole('region', {
+      name: /yarn inventory list/i,
+    })
+
+    const woolEaseCard = within(inventoryList)
+      .getByRole('heading', { name: /wool-ease/i })
+      .closest('article')
+    expect(woolEaseCard).not.toBeNull()
+
+    await user.click(
+      within(woolEaseCard as HTMLElement).getByRole('button', {
+        name: /edit/i,
+      })
+    )
+
+    await user.clear(screen.getByLabelText(/quantity in stock/i))
+    await user.type(screen.getByLabelText(/quantity in stock/i), '2.5')
+    await user.click(screen.getByRole('button', { name: /save changes/i }))
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+
+    const updatedCard = within(inventoryList)
+      .getByRole('heading', { name: /wool-ease/i })
+      .closest('article')
+    expect(updatedCard).not.toBeNull()
+    expect(
+      within(updatedCard as HTMLElement).getByText('2.5 skeins')
+    ).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent(
+      /updated successfully/i
+    )
+  })
+
   it('blocks save when negative measurement values are entered', async () => {
     const user = userEvent.setup()
     render(<App />)
@@ -117,6 +156,38 @@ describe('App', () => {
       screen.getByText(/yardage must be a non-negative number/i)
     ).toBeInTheDocument()
     expect(screen.getByRole('dialog')).toBeInTheDocument()
+  })
+
+  it('blocks save and shows a validation message for negative quantity', async () => {
+    localStorage.clear()
+
+    const user = userEvent.setup()
+    render(<App />)
+
+    const inventoryList = await screen.findByRole('region', {
+      name: /yarn inventory list/i,
+    })
+
+    const woolEaseCard = within(inventoryList)
+      .getByRole('heading', { name: /wool-ease/i })
+      .closest('article')
+    expect(woolEaseCard).not.toBeNull()
+
+    await user.click(
+      within(woolEaseCard as HTMLElement).getByRole('button', {
+        name: /edit/i,
+      })
+    )
+
+    await user.clear(screen.getByLabelText(/quantity in stock/i))
+    await user.type(screen.getByLabelText(/quantity in stock/i), '-1')
+    await user.click(screen.getByRole('button', { name: /save changes/i }))
+
+    expect(screen.getByText(/quantity must be a non-negative number/i)).toBeInTheDocument()
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(
+      screen.getByText(/please fix the highlighted fields before saving/i)
+    ).toBeInTheDocument()
   })
 
   it('persists and renders edited hand dyed and superwash states', async () => {
