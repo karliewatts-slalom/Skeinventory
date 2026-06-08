@@ -42,4 +42,30 @@ describe('validateYarnDraft', () => {
     expect(errors.quantityInStock).toMatch(/non-negative number/i)
     expect(errors.grams).toMatch(/non-negative number/i)
   })
+
+  it('requires weight category to be in allowed enum values', () => {
+    const errors = validateYarnDraft({
+      ...DEFAULT_CREATE_YARN_DRAFT,
+      maker: 'Cascade',
+      yarnName: '220 Superwash',
+      materialType: 'Wool',
+      weightCategory: 'invalid-weight' as never,
+    })
+
+    expect(errors.weightCategory).toMatch(/must be valid/i)
+  })
+
+  it('blocks negative yardage and meters values', () => {
+    const errors = validateYarnDraft({
+      ...DEFAULT_CREATE_YARN_DRAFT,
+      maker: 'Cascade',
+      yarnName: '220 Superwash',
+      materialType: 'Wool',
+      yardage: '-1',
+      meters: '-3',
+    })
+
+    expect(errors.yardage).toMatch(/non-negative number/i)
+    expect(errors.meters).toMatch(/non-negative number/i)
+  })
 })

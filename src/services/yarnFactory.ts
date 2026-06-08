@@ -1,4 +1,5 @@
 import {
+  WEIGHT_CATEGORIES,
   type CreateYarnDraft,
   type WeightCategory,
   type Yarn,
@@ -7,17 +8,7 @@ import {
 const toNumber = (value: string): number => Number(value)
 
 const normalizeWeightCategory = (value: string): WeightCategory => {
-  const categories: WeightCategory[] = [
-    'lace',
-    'fingering',
-    'sport',
-    'dk',
-    'worsted',
-    'aran',
-    'bulky',
-  ]
-
-  if (categories.includes(value as WeightCategory)) {
+  if (WEIGHT_CATEGORIES.includes(value as WeightCategory)) {
     return value as WeightCategory
   }
 

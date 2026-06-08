@@ -7,6 +7,16 @@ export type WeightCategory =
   | 'aran'
   | 'bulky'
 
+export const WEIGHT_CATEGORIES: WeightCategory[] = [
+  'lace',
+  'fingering',
+  'sport',
+  'dk',
+  'worsted',
+  'aran',
+  'bulky',
+]
+
 export interface ImageRef {
   id: string
   url: string

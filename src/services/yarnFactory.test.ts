@@ -59,4 +59,34 @@ describe('yarnFactory', () => {
     expect(draft.yarnName).toBe(record.yarnName)
     expect(draft.materialType).toBe(record.materialType)
   })
+
+  it('normalizes numeric measurement strings to numbers without derived math', () => {
+    const normalized = normalizeYarnDraftValues({
+      ...DEFAULT_CREATE_YARN_DRAFT,
+      maker: 'Malabrigo',
+      yarnName: 'Rios',
+      materialType: 'Merino Wool',
+      yardage: '210',
+      meters: '192.5',
+      grams: '100',
+      quantityInStock: '2.25',
+    })
+
+    expect(normalized.totalYardage).toBe(210)
+    expect(normalized.totalMeters).toBe(192.5)
+    expect(normalized.totalGrams).toBe(100)
+    expect(normalized.quantityInStock).toBe(2.25)
+  })
+
+  it('falls back to fingering when weight category input is invalid', () => {
+    const normalized = normalizeYarnDraftValues({
+      ...DEFAULT_CREATE_YARN_DRAFT,
+      maker: 'Malabrigo',
+      yarnName: 'Rios',
+      materialType: 'Merino Wool',
+      weightCategory: 'unknown' as never,
+    })
+
+    expect(normalized.weightCategory).toBe('fingering')
+  })
 })

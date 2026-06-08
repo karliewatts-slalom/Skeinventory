@@ -1,4 +1,8 @@
-import type { CreateYarnDraft, CreateYarnFieldError } from '../types/yarn'
+import {
+  WEIGHT_CATEGORIES,
+  type CreateYarnDraft,
+  type CreateYarnFieldError,
+} from '../types/yarn'
 
 const hasText = (value: string): boolean => value.trim().length > 0
 
@@ -31,6 +35,8 @@ export const validateYarnDraft = (
 
   if (!hasText(draft.weightCategory)) {
     errors.weightCategory = 'Weight category is required.'
+  } else if (!WEIGHT_CATEGORIES.includes(draft.weightCategory)) {
+    errors.weightCategory = 'Weight category must be valid.'
   }
 
   if (parseNonNegativeNumber(draft.yardage) === null) {

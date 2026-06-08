@@ -1,4 +1,5 @@
 import { type FormEvent, useEffect, useMemo, useRef } from 'react'
+import { WEIGHT_CATEGORIES } from '../types/yarn'
 import type {
   CreateYarnDraft,
   CreateYarnFieldError,
@@ -6,15 +7,7 @@ import type {
   YarnEditorMode,
 } from '../types/yarn'
 
-const WEIGHT_OPTIONS: WeightCategory[] = [
-  'lace',
-  'fingering',
-  'sport',
-  'dk',
-  'worsted',
-  'aran',
-  'bulky',
-]
+const WEIGHT_OPTIONS: WeightCategory[] = WEIGHT_CATEGORIES
 
 interface AddYarnModalProps {
   mode: YarnEditorMode

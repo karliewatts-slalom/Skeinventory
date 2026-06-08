@@ -77,4 +77,25 @@ describe('App', () => {
       /updated successfully/i
     )
   })
+
+  it('blocks save when negative measurement values are entered', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(
+      await screen.findByRole('button', { name: /add new skeinventory/i })
+    )
+
+    await user.type(screen.getByLabelText(/maker/i), 'Maker')
+    await user.type(screen.getByLabelText(/yarn name/i), 'Name')
+    await user.type(screen.getByLabelText(/material type/i), 'Wool')
+    await user.clear(screen.getByLabelText(/yardage/i))
+    await user.type(screen.getByLabelText(/yardage/i), '-2')
+    await user.click(screen.getByRole('button', { name: /add skeinventory/i }))
+
+    expect(
+      screen.getByText(/yardage must be a non-negative number/i)
+    ).toBeInTheDocument()
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+  })
 })
