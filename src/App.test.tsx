@@ -509,4 +509,29 @@ describe('App', () => {
 
     confirmSpy.mockRestore()
   })
+
+  it('persists data across full app restart reload', async () => {
+    localStorage.clear()
+
+    const user = userEvent.setup()
+    const firstRender = render(<App />)
+
+    await user.click(
+      await screen.findByRole('button', { name: /add new skeinventory/i })
+    )
+    await user.type(screen.getByLabelText(/^maker \*$/i), 'Restart Maker')
+    await user.type(screen.getByLabelText(/yarn name/i), 'Restart Yarn')
+    await user.type(screen.getByLabelText(/material type/i), 'Wool')
+    await user.click(screen.getByRole('button', { name: /add skeinventory/i }))
+
+    expect(screen.getByRole('heading', { name: /restart yarn/i })).toBeInTheDocument()
+
+    firstRender.unmount()
+
+    render(<App />)
+
+    expect(
+      await screen.findByRole('heading', { name: /restart yarn/i })
+    ).toBeInTheDocument()
+  })
 })

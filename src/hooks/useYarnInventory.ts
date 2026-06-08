@@ -8,7 +8,6 @@ import {
   localStorageInventoryRepository,
   type InventoryRepository,
 } from '../services/inventoryRepository'
-import { sampleInventoryRecords } from '../services/seedData'
 
 interface UseYarnInventoryResult {
   records: Yarn[]
@@ -44,16 +43,14 @@ export const useYarnInventory = (
           return
         }
 
-        setRecords(loaded.length > 0 ? loaded : sampleInventoryRecords)
+        setRecords(loaded)
       } catch {
         if (!isMounted) {
           return
         }
 
-        setRecords(sampleInventoryRecords)
-        setOperationError(
-          'We could not load saved inventory. Showing sample data.'
-        )
+        setRecords([])
+        setOperationError('We could not load saved inventory.')
       } finally {
         if (isMounted) {
           setIsLoading(false)

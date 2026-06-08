@@ -1,8 +1,12 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import type { InventoryRepository } from '../services/inventoryRepository'
+import { sampleInventoryRecords } from '../services/seedData'
 import { DEFAULT_CREATE_YARN_DRAFT } from '../types/yarn'
 import { useYarnInventory } from './useYarnInventory'
+
+const cloneSampleRecords = (): unknown[] =>
+  JSON.parse(JSON.stringify(sampleInventoryRecords)) as unknown[]
 
 describe('useYarnInventory persistence', () => {
   it('persists numeric measurement and weight values across reloads', async () => {
@@ -53,7 +57,7 @@ describe('useYarnInventory persistence', () => {
   })
 
   it('persists edited handDyed and superwash values across reloads', async () => {
-    let persisted: unknown[] = []
+    let persisted: unknown[] = cloneSampleRecords()
 
     const repository: InventoryRepository = {
       async load() {
@@ -109,7 +113,7 @@ describe('useYarnInventory persistence', () => {
   it('keeps existing data unchanged and exposes clear error when edit save fails', async () => {
     const repository: InventoryRepository = {
       async load() {
-        return [] as never
+        return cloneSampleRecords() as never
       },
       async save() {
         throw new Error('write failed')
@@ -155,7 +159,7 @@ describe('useYarnInventory persistence', () => {
   })
 
   it('archives an active record and persists the archived flag across reloads', async () => {
-    let persisted: unknown[] = []
+    let persisted: unknown[] = cloneSampleRecords()
 
     const repository: InventoryRepository = {
       async load() {
@@ -197,7 +201,7 @@ describe('useYarnInventory persistence', () => {
   })
 
   it('restores an archived record and persists the active flag across reloads', async () => {
-    let persisted: unknown[] = []
+    let persisted: unknown[] = cloneSampleRecords()
 
     const repository: InventoryRepository = {
       async load() {
@@ -241,7 +245,7 @@ describe('useYarnInventory persistence', () => {
   it('keeps existing data unchanged and exposes clear error when restore save fails', async () => {
     const repository: InventoryRepository = {
       async load() {
-        return [] as never
+        return cloneSampleRecords() as never
       },
       async save() {
         throw new Error('write failed')
@@ -276,7 +280,7 @@ describe('useYarnInventory persistence', () => {
   })
 
   it('deletes a record and persists removal across reloads', async () => {
-    let persisted: unknown[] = []
+    let persisted: unknown[] = cloneSampleRecords()
 
     const repository: InventoryRepository = {
       async load() {
@@ -318,7 +322,7 @@ describe('useYarnInventory persistence', () => {
   it('keeps existing data unchanged and exposes clear error when delete save fails', async () => {
     const repository: InventoryRepository = {
       async load() {
-        return [] as never
+        return cloneSampleRecords() as never
       },
       async save() {
         throw new Error('write failed')
@@ -348,5 +352,27 @@ describe('useYarnInventory persistence', () => {
     expect(hook.result.current.operationError).toBe('Deleting failed. Please try again.')
     expect(hook.result.current.statusMessage).toBeNull()
     expect(hook.result.current.records).toEqual(before)
+  })
+
+  it('does not fallback to seed data when load fails', async () => {
+    const repository: InventoryRepository = {
+      async load() {
+        throw new Error('load failed')
+      },
+      async save() {
+        throw new Error('not used')
+      },
+    }
+
+    const hook = renderHook(() => useYarnInventory(repository))
+
+    await waitFor(() => {
+      expect(hook.result.current.isLoading).toBe(false)
+    })
+
+    expect(hook.result.current.records).toEqual([])
+    expect(hook.result.current.operationError).toBe(
+      'We could not load saved inventory.'
+    )
   })
 })

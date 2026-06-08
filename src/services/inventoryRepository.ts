@@ -1,4 +1,5 @@
 import type { Yarn } from '../types/yarn'
+import { sampleInventoryRecords } from './seedData'
 
 export interface InventoryRepository {
   load(): Promise<Yarn[]>
@@ -6,6 +7,9 @@ export interface InventoryRepository {
 }
 
 const STORAGE_KEY = 'skeinventory.records.v1'
+
+const cloneRecords = (records: Yarn[]): Yarn[] =>
+  JSON.parse(JSON.stringify(records)) as Yarn[]
 
 const isYarnRecord = (value: unknown): value is Yarn => {
   if (typeof value !== 'object' || value === null) {
@@ -34,8 +38,11 @@ export const localStorageInventoryRepository: InventoryRepository = {
   async load() {
     const raw = localStorage.getItem(STORAGE_KEY)
 
-    if (!raw) {
-      return []
+    // Bootstrap once on first run when no persisted inventory exists.
+    if (raw === null) {
+      const bootstrapRecords = cloneRecords(sampleInventoryRecords)
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(bootstrapRecords))
+      return bootstrapRecords
     }
 
     const parsed = JSON.parse(raw) as unknown
