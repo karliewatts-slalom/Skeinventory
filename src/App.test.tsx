@@ -300,6 +300,70 @@ describe('App', () => {
     expect(screen.getByRole('heading', { name: /wool-ease/i })).toBeInTheDocument()
   })
 
+  it('filters records as search text is entered and restores on clear', async () => {
+    localStorage.clear()
+
+    const user = userEvent.setup()
+    render(<App />)
+
+    await screen.findByRole('region', {
+      name: /yarn inventory list/i,
+    })
+
+    const searchInput = screen.getByLabelText(/search inventory/i)
+
+    expect(await screen.findByRole('heading', { name: /rios/i })).toBeInTheDocument()
+    expect(
+      await screen.findByRole('heading', { name: /220 superwash/i })
+    ).toBeInTheDocument()
+
+    await user.type(searchInput, 'casc')
+
+    expect(screen.queryByRole('heading', { name: /rios/i })).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: /220 superwash/i })
+    ).toBeInTheDocument()
+
+    await user.clear(searchInput)
+
+    expect(await screen.findByRole('heading', { name: /rios/i })).toBeInTheDocument()
+    expect(
+      await screen.findByRole('heading', { name: /220 superwash/i })
+    ).toBeInTheDocument()
+  })
+
+  it('shows no-results message when search has no matches', async () => {
+    localStorage.clear()
+
+    const user = userEvent.setup()
+    render(<App />)
+
+    const searchInput = screen.getByLabelText(/search inventory/i)
+    await user.type(searchInput, 'zzzz-not-found')
+
+    expect(screen.getByText('No results match your search')).toBeInTheDocument()
+  })
+
+  it('applies search inside archived view', async () => {
+    localStorage.clear()
+
+    const user = userEvent.setup()
+    render(<App />)
+
+    const inventoryViewToggle = screen.getByRole('group', {
+      name: /inventory view/i,
+    })
+    await user.click(
+      within(inventoryViewToggle).getByRole('button', { name: /archived/i })
+    )
+
+    const searchInput = screen.getByLabelText(/search inventory/i)
+    await user.type(searchInput, 'blend')
+
+    expect(screen.getByRole('heading', { name: /wool-ease/i })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: /rios/i })).not.toBeInTheDocument()
+  })
+
   it('deletes a record after confirmation and removes it from the list', async () => {
     localStorage.clear()
 

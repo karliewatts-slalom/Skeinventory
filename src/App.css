@@ -102,6 +102,32 @@
   padding: 0.65rem 0.75rem;
 }
 
+.search-row {
+  margin: 0 0 1rem;
+}
+
+.search-label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.search-input {
+  width: min(28rem, 100%);
+  border: 1px solid #cfd0d5;
+  border-radius: 0.55rem;
+  background: #efeff2;
+  color: #17171a;
+  font-size: 1rem;
+  padding: 0.65rem 0.8rem;
+}
+
+.search-input:focus-visible {
+  outline: 2px solid #17171a;
+  outline-offset: 2px;
+}
+
 .view-toggle {
   display: flex;
   gap: 0.6rem;

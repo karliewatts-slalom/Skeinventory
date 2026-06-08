@@ -2,6 +2,7 @@ import type { Yarn } from '../types/yarn'
 
 interface YarnInventoryListProps {
   records: Yarn[]
+  emptyStateVariant: 'none' | 'no-records' | 'no-results'
   isLoading: boolean
   onEdit: (record: Yarn) => void
   onArchive: (recordId: string) => void
@@ -28,6 +29,7 @@ const getImageAltText = (record: Yarn): string =>
 
 export const YarnInventoryList = ({
   records,
+  emptyStateVariant,
   isLoading,
   onEdit,
   onArchive,
@@ -41,8 +43,9 @@ export const YarnInventoryList = ({
   if (records.length === 0) {
     return (
       <p className="inventory-state">
-        No yarn records yet. Use Add New Skeinventory to create your first
-        entry.
+        {emptyStateVariant === 'no-records'
+          ? 'No yarn in your inventory yet'
+          : 'No results match your search'}
       </p>
     )
   }

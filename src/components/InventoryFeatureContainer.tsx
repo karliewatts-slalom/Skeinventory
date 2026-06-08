@@ -4,11 +4,13 @@ import { YarnInventoryList } from './YarnInventoryList'
 import { useYarnEditor } from '../hooks/useYarnEditor'
 import { useYarnInventory } from '../hooks/useYarnInventory'
 import { useState } from 'react'
+import { filterInventory } from '../services/inventorySearch'
 
 type InventoryViewMode = 'active' | 'archived'
 
 export const InventoryFeatureContainer = () => {
   const [viewMode, setViewMode] = useState<InventoryViewMode>('active')
+  const [searchQuery, setSearchQuery] = useState('')
   const {
     records,
     statusMessage,
@@ -33,9 +35,17 @@ export const InventoryFeatureContainer = () => {
     submit,
   } = useYarnEditor()
 
-  const visibleRecords = records.filter((record) =>
+  const viewFilteredRecords = records.filter((record) =>
     viewMode === 'active' ? !record.archived : record.archived
   )
+  const visibleRecords = filterInventory(viewFilteredRecords, searchQuery)
+
+  const emptyStateVariant =
+    records.length === 0
+      ? 'no-records'
+      : visibleRecords.length === 0
+        ? 'no-results'
+        : 'none'
 
   return (
     <div className="app-shell">
@@ -57,6 +67,19 @@ export const InventoryFeatureContainer = () => {
               {statusMessage}
             </p>
           )}
+          <div className="search-row">
+            <label htmlFor="inventory-search" className="search-label">
+              Search inventory
+            </label>
+            <input
+              id="inventory-search"
+              type="search"
+              className="search-input"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Search maker, yarn, material, or weight"
+            />
+          </div>
           <div className="view-toggle" role="group" aria-label="Inventory view">
             <button
               type="button"
@@ -75,6 +98,7 @@ export const InventoryFeatureContainer = () => {
           </div>
           <YarnInventoryList
             records={visibleRecords}
+            emptyStateVariant={emptyStateVariant}
             isLoading={isLoading}
             onEdit={openEdit}
             onArchive={(recordId) => {
