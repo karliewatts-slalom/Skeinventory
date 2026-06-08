@@ -21,6 +21,7 @@ const isYarnRecord = (value: unknown): value is Yarn => {
     typeof candidate.materialType === 'string' &&
     typeof candidate.weightCategory === 'string' &&
     typeof candidate.quantityInStock === 'number' &&
+    (candidate.imageUrl === undefined || typeof candidate.imageUrl === 'string') &&
     typeof candidate.handDyed === 'boolean' &&
     typeof candidate.superwash === 'boolean' &&
     typeof candidate.archived === 'boolean' &&

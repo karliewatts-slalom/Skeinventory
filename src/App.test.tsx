@@ -55,6 +55,25 @@ describe('App', () => {
     expect(screen.getByRole('status')).toHaveTextContent(/added successfully/i)
   })
 
+  it('persists and displays optional image URL on the yarn card', async () => {
+    localStorage.clear()
+
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(
+      await screen.findByRole('button', { name: /add new skeinventory/i })
+    )
+    await user.type(screen.getByLabelText(/image \(optional\)/i), 'https://example.com/rios.jpg')
+    await user.type(screen.getByLabelText(/maker/i), 'Image Maker')
+    await user.type(screen.getByLabelText(/yarn name/i), 'Image Yarn')
+    await user.type(screen.getByLabelText(/material type/i), 'Wool')
+    await user.click(screen.getByRole('button', { name: /add skeinventory/i }))
+
+    const image = screen.getByRole('img', { name: /image maker image yarn/i })
+    expect(image).toHaveAttribute('src', 'https://example.com/rios.jpg')
+  })
+
   it('edits core detail fields and persists them in list view', async () => {
     const user = userEvent.setup()
     render(<App />)

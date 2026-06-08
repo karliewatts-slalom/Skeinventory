@@ -20,6 +20,9 @@ const Badge = ({
   tone: 'pink' | 'purple' | 'sand'
 }) => <span className={`badge badge-${tone}`}>{label}</span>
 
+const getImageAltText = (record: Yarn): string =>
+  `${record.maker} ${record.yarnName}`.trim()
+
 export const YarnInventoryList = ({
   records,
   isLoading,
@@ -45,9 +48,18 @@ export const YarnInventoryList = ({
           className={`inventory-card ${record.archived ? 'is-archived' : ''}`}
           key={record.id}
         >
-          <div className="card-image" aria-hidden="true">
-            <span>image</span>
-          </div>
+          {record.imageUrl ? (
+            <img
+              className="card-image"
+              src={record.imageUrl}
+              alt={getImageAltText(record)}
+              loading="lazy"
+            />
+          ) : (
+            <div className="card-image card-image-placeholder" aria-hidden="true">
+              <span>image</span>
+            </div>
+          )}
 
           <div className="card-content">
             <p className="card-maker">{record.maker}</p>

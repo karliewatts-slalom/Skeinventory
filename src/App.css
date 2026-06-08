@@ -122,6 +122,12 @@
 
 .card-image {
   height: 12rem;
+  width: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.card-image-placeholder {
   background: linear-gradient(130deg, #ebe2f5, #f8e8de);
   color: #827f91;
   display: flex;
@@ -301,19 +307,6 @@
 
 .grid-three {
   grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.upload-box {
-  margin-top: 0.6rem;
-  border: 2px dashed #d3d4d8;
-  border-radius: 0.7rem;
-  text-align: center;
-  padding: 1rem;
-  color: #6e6e84;
-}
-
-.upload-box p {
-  margin: 0.2rem 0;
 }
 
 .checkbox-group {

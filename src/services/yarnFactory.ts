@@ -35,7 +35,7 @@ export const normalizeYarnDraftValues = (
 })
 
 export const createDraftFromYarn = (record: Yarn): CreateYarnDraft => ({
-  imageUrl: record.image?.url ?? '',
+  imageUrl: record.imageUrl ?? '',
   maker: record.maker,
   yarnName: record.yarnName,
   yardage: String(record.totalYardage ?? 0),
@@ -76,13 +76,7 @@ export const createYarnFromDraft = (draft: CreateYarnDraft): Yarn => {
     totalYardage: normalized.totalYardage,
     totalMeters: normalized.totalMeters,
     totalGrams: normalized.totalGrams,
-    image: normalized.imageUrl
-      ? {
-          id: createId(),
-          url: normalized.imageUrl,
-          alt: `${normalized.maker} ${normalized.yarnName}`.trim(),
-        }
-      : undefined,
+    imageUrl: normalized.imageUrl || undefined,
     archived: normalized.archived,
     createdAt: now,
     updatedAt: now,

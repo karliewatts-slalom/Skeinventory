@@ -108,13 +108,7 @@ export const useYarnInventory = (
             totalMeters: normalized.totalMeters,
             totalGrams: normalized.totalGrams,
             archived: normalized.archived,
-            image: normalized.imageUrl
-              ? {
-                  id: record.image?.id ?? record.id,
-                  url: normalized.imageUrl,
-                  alt: `${normalized.maker} ${normalized.yarnName}`.trim(),
-                }
-              : undefined,
+            imageUrl: normalized.imageUrl || undefined,
             updatedAt: new Date().toISOString(),
           }
         : record

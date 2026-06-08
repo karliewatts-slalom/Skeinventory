@@ -75,7 +75,7 @@ describe('useYarnInventory persistence', () => {
 
     await act(async () => {
       await firstMount.result.current.updateRecordFromDraft(existing!.id, {
-        imageUrl: existing?.image?.url ?? '',
+        imageUrl: existing?.imageUrl ?? '',
         maker: existing!.maker,
         yarnName: existing!.yarnName,
         yardage: String(existing!.totalYardage ?? 0),

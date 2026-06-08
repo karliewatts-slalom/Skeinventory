@@ -1,4 +1,4 @@
-import { type FormEvent, useEffect, useMemo, useRef } from 'react'
+import { type FormEvent, useEffect, useRef } from 'react'
 import { WEIGHT_CATEGORIES } from '../types/yarn'
 import type {
   CreateYarnDraft,
@@ -84,14 +84,6 @@ export const AddYarnModal = ({
     }
   }, [onCancel])
 
-  const imageHint = useMemo(() => {
-    if (draft.imageUrl.trim().length > 0) {
-      return draft.imageUrl
-    }
-
-    return 'Click to upload image\\nPNG, JPG up to 10MB'
-  }, [draft.imageUrl])
-
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     await onSubmit()
@@ -135,11 +127,6 @@ export const AddYarnModal = ({
                 fieldErrors.imageUrl ? 'imageUrl-error' : undefined
               }
             />
-            <div className="upload-box" aria-hidden="true">
-              {imageHint.split('\\n').map((line) => (
-                <p key={line}>{line}</p>
-              ))}
-            </div>
             {fieldErrors.imageUrl && (
               <p id="imageUrl-error" className="field-error" role="alert">
                 {fieldErrors.imageUrl}

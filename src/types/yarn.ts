@@ -17,12 +17,6 @@ export const WEIGHT_CATEGORIES: WeightCategory[] = [
   'bulky',
 ]
 
-export interface ImageRef {
-  id: string
-  url: string
-  alt?: string
-}
-
 export interface Yarn {
   id: string
   maker: string
@@ -38,7 +32,7 @@ export interface Yarn {
   perSkeinYardage?: number
   perSkeinMeters?: number
   perSkeinGrams?: number
-  image?: ImageRef
+  imageUrl?: string
   archived: boolean
   createdAt: string
   updatedAt: string

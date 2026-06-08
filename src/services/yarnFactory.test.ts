@@ -103,4 +103,28 @@ describe('yarnFactory', () => {
     expect(normalized.handDyed).toBe(true)
     expect(normalized.superwash).toBe(false)
   })
+
+  it('maps non-empty image URL into persisted imageUrl field', () => {
+    const created = createYarnFromDraft({
+      ...DEFAULT_CREATE_YARN_DRAFT,
+      maker: 'Cascade',
+      yarnName: '220 Superwash',
+      materialType: 'Wool',
+      imageUrl: 'https://example.com/yarn.jpg',
+    })
+
+    expect(created.imageUrl).toBe('https://example.com/yarn.jpg')
+  })
+
+  it('omits persisted imageUrl when input is blank', () => {
+    const created = createYarnFromDraft({
+      ...DEFAULT_CREATE_YARN_DRAFT,
+      maker: 'Cascade',
+      yarnName: '220 Superwash',
+      materialType: 'Wool',
+      imageUrl: '   ',
+    })
+
+    expect(created.imageUrl).toBeUndefined()
+  })
 })
