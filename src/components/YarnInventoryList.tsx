@@ -3,6 +3,7 @@ import type { Yarn } from '../types/yarn'
 interface YarnInventoryListProps {
   records: Yarn[]
   isLoading: boolean
+  onEdit: (record: Yarn) => void
 }
 
 const formatQuantity = (value: number): string =>
@@ -22,6 +23,7 @@ const Badge = ({
 export const YarnInventoryList = ({
   records,
   isLoading,
+  onEdit,
 }: YarnInventoryListProps) => {
   if (isLoading) {
     return <p className="inventory-state">Loading inventory...</p>
@@ -75,6 +77,14 @@ export const YarnInventoryList = ({
               {record.totalYardage ?? 0} yds {record.totalMeters ?? 0}m{' '}
               {record.totalGrams ?? 0}g
             </p>
+
+            <button
+              type="button"
+              className="card-edit-button"
+              onClick={() => onEdit(record)}
+            >
+              Edit
+            </button>
           </div>
         </article>
       ))}

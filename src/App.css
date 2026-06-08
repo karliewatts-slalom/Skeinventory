@@ -191,6 +191,16 @@
   color: #65657b;
 }
 
+.card-edit-button {
+  margin-top: 0.75rem;
+  border: 1px solid #cfcfd2;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  color: #17171a;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.9rem;
+}
+
 .inventory-state {
   font-size: 1rem;
   color: #595975;

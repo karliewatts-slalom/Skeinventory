@@ -53,4 +53,28 @@ describe('App', () => {
     expect(screen.getByText('Test Maker')).toBeInTheDocument()
     expect(screen.getByRole('status')).toHaveTextContent(/added successfully/i)
   })
+
+  it('edits core detail fields and persists them in list view', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    const editButtons = await screen.findAllByRole('button', { name: /edit/i })
+    expect(editButtons.length).toBeGreaterThan(0)
+    await user.click(editButtons[0]!)
+    await user.clear(screen.getByLabelText(/maker/i))
+    await user.type(screen.getByLabelText(/maker/i), 'Updated Maker')
+    await user.clear(screen.getByLabelText(/yarn name/i))
+    await user.type(screen.getByLabelText(/yarn name/i), 'Updated Yarn')
+    await user.clear(screen.getByLabelText(/material type/i))
+    await user.type(screen.getByLabelText(/material type/i), 'Updated Material')
+    await user.click(screen.getByRole('button', { name: /save changes/i }))
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(screen.getByText('Updated Maker')).toBeInTheDocument()
+    expect(screen.getByText('Updated Yarn')).toBeInTheDocument()
+    expect(screen.getByText('Updated Material')).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent(
+      /updated successfully/i
+    )
+  })
 })

@@ -1,22 +1,30 @@
 import { AddYarnModal } from './AddYarnModal'
 import { InventoryFilters } from './InventoryFilters'
 import { YarnInventoryList } from './YarnInventoryList'
+import { useYarnEditor } from '../hooks/useYarnEditor'
 import { useYarnInventory } from '../hooks/useYarnInventory'
 
 export const InventoryFeatureContainer = () => {
   const {
     records,
-    isModalOpen,
+    statusMessage,
+    operationError,
+    isLoading,
+    createRecordFromDraft,
+    updateRecordFromDraft,
+  } = useYarnInventory()
+  const {
+    isOpen,
+    mode,
     draft,
     fieldErrors,
     submitError,
-    statusMessage,
-    isLoading,
-    openModal,
-    closeModal,
+    openCreate,
+    openEdit,
+    close,
     updateDraft,
-    submitDraft,
-  } = useYarnInventory()
+    submit,
+  } = useYarnEditor()
 
   return (
     <div className="app-shell">
@@ -28,27 +36,46 @@ export const InventoryFeatureContainer = () => {
         <InventoryFilters />
 
         <main className="inventory-area">
+          {operationError && (
+            <p className="submit-error" role="alert">
+              {operationError}
+            </p>
+          )}
           {statusMessage && (
             <p className="status-message" role="status" aria-live="polite">
               {statusMessage}
             </p>
           )}
-          <YarnInventoryList records={records} isLoading={isLoading} />
+          <YarnInventoryList
+            records={records}
+            isLoading={isLoading}
+            onEdit={openEdit}
+          />
         </main>
       </div>
 
-      <button type="button" className="floating-add-button" onClick={openModal}>
+      <button
+        type="button"
+        className="floating-add-button"
+        onClick={openCreate}
+      >
         + Add New Skeinventory
       </button>
 
-      {isModalOpen && (
+      {isOpen && (
         <AddYarnModal
-          draft={draft}
+          mode={mode}
+          initialValues={draft}
           fieldErrors={fieldErrors}
           submitError={submitError}
           onDraftChange={updateDraft}
-          onCancel={closeModal}
-          onSubmit={submitDraft}
+          onCancel={close}
+          onSubmit={() =>
+            submit({
+              onCreate: createRecordFromDraft,
+              onEdit: updateRecordFromDraft,
+            })
+          }
         />
       )}
     </div>

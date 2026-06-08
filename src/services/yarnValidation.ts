@@ -12,7 +12,7 @@ const parseNonNegativeNumber = (value: string): number | null => {
   return parsed
 }
 
-export const validateCreateYarnDraft = (
+export const validateYarnDraft = (
   draft: CreateYarnDraft
 ): CreateYarnFieldError => {
   const errors: CreateYarnFieldError = {}
@@ -60,6 +60,9 @@ export const validateCreateYarnDraft = (
 
   return errors
 }
+
+// Backward-compatible alias for existing create flow call sites.
+export const validateCreateYarnDraft = validateYarnDraft
 
 export const hasFieldErrors = (errors: CreateYarnFieldError): boolean =>
   Object.keys(errors).length > 0

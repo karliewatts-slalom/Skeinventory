@@ -3,6 +3,7 @@ import type {
   CreateYarnDraft,
   CreateYarnFieldError,
   WeightCategory,
+  YarnEditorMode,
 } from '../types/yarn'
 
 const WEIGHT_OPTIONS: WeightCategory[] = [
@@ -16,7 +17,8 @@ const WEIGHT_OPTIONS: WeightCategory[] = [
 ]
 
 interface AddYarnModalProps {
-  draft: CreateYarnDraft
+  mode: YarnEditorMode
+  initialValues: CreateYarnDraft
   fieldErrors: CreateYarnFieldError
   submitError: string | null
   onDraftChange: (patch: Partial<CreateYarnDraft>) => void
@@ -28,13 +30,15 @@ const formatWeightOption = (value: WeightCategory): string =>
   value.charAt(0).toUpperCase() + value.slice(1)
 
 export const AddYarnModal = ({
-  draft,
+  mode,
+  initialValues,
   fieldErrors,
   submitError,
   onDraftChange,
   onCancel,
   onSubmit,
 }: AddYarnModalProps) => {
+  const draft = initialValues
   const dialogRef = useRef<HTMLDivElement>(null)
   const firstInputRef = useRef<HTMLInputElement>(null)
 
@@ -110,7 +114,9 @@ export const AddYarnModal = ({
         ref={dialogRef}
       >
         <header className="modal-header">
-          <h2 id="add-yarn-heading">Add New Skeinventory</h2>
+          <h2 id="add-yarn-heading">
+            {mode === 'create' ? 'Add New Skeinventory' : 'Edit Skeinventory'}
+          </h2>
           <button
             type="button"
             className="modal-close"
@@ -339,7 +345,7 @@ export const AddYarnModal = ({
               Cancel
             </button>
             <button type="submit" className="submit-button">
-              Add Skeinventory
+              {mode === 'create' ? 'Add Skeinventory' : 'Save Changes'}
             </button>
           </footer>
         </form>

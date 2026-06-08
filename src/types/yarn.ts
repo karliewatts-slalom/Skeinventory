@@ -49,6 +49,8 @@ export interface CreateYarnDraft {
   archived: boolean
 }
 
+export type YarnEditorMode = 'create' | 'edit'
+
 export type CreateYarnFieldError = Partial<
   Record<
     | 'maker'
