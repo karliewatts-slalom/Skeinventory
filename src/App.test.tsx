@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import { within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import App from './App'
@@ -97,5 +98,47 @@ describe('App', () => {
       screen.getByText(/yardage must be a non-negative number/i)
     ).toBeInTheDocument()
     expect(screen.getByRole('dialog')).toBeInTheDocument()
+  })
+
+  it('persists and renders edited hand dyed and superwash states', async () => {
+    localStorage.clear()
+
+    const user = userEvent.setup()
+    render(<App />)
+
+    const inventoryList = await screen.findByRole('region', {
+      name: /yarn inventory list/i,
+    })
+
+    const woolEaseHeading = within(inventoryList).getByRole('heading', {
+      name: /wool-ease/i,
+    })
+    const woolEaseCard = woolEaseHeading.closest('article')
+    expect(woolEaseCard).not.toBeNull()
+
+    const editButton = within(woolEaseCard as HTMLElement).getByRole('button', {
+      name: /edit/i,
+    })
+    await user.click(editButton)
+
+    await user.click(screen.getByRole('checkbox', { name: /hand dyed/i }))
+    await user.click(screen.getByRole('checkbox', { name: /superwash/i }))
+    await user.click(screen.getByRole('button', { name: /save changes/i }))
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+
+    const updatedWoolEaseCard = within(inventoryList)
+      .getByRole('heading', { name: /wool-ease/i })
+      .closest('article')
+    expect(updatedWoolEaseCard).not.toBeNull()
+    expect(
+      within(updatedWoolEaseCard as HTMLElement).getByText('Hand Dyed')
+    ).toBeInTheDocument()
+    expect(
+      within(updatedWoolEaseCard as HTMLElement).getByText('Superwash')
+    ).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent(
+      /updated successfully/i
+    )
   })
 })

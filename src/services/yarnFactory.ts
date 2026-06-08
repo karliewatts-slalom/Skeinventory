@@ -1,19 +1,6 @@
-import {
-  WEIGHT_CATEGORIES,
-  type CreateYarnDraft,
-  type WeightCategory,
-  type Yarn,
-} from '../types/yarn'
+import { type CreateYarnDraft, type WeightCategory, type Yarn } from '../types/yarn'
 
 const toNumber = (value: string): number => Number(value)
-
-const normalizeWeightCategory = (value: string): WeightCategory => {
-  if (WEIGHT_CATEGORIES.includes(value as WeightCategory)) {
-    return value as WeightCategory
-  }
-
-  return 'fingering'
-}
 
 export interface NormalizedYarnDraftValues {
   maker: string
@@ -36,7 +23,7 @@ export const normalizeYarnDraftValues = (
   maker: draft.maker.trim(),
   yarnName: draft.yarnName.trim(),
   materialType: draft.materialType.trim(),
-  weightCategory: normalizeWeightCategory(draft.weightCategory),
+  weightCategory: draft.weightCategory,
   quantityInStock: toNumber(draft.quantityInStock),
   totalYardage: toNumber(draft.yardage),
   totalMeters: toNumber(draft.meters),

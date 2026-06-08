@@ -51,4 +51,58 @@ describe('useYarnInventory persistence', () => {
     expect(record?.totalGrams).toBe(100)
     expect(record?.weightCategory).toBe('fingering')
   })
+
+  it('persists edited handDyed and superwash values across reloads', async () => {
+    let persisted: unknown[] = []
+
+    const repository: InventoryRepository = {
+      async load() {
+        return persisted as never
+      },
+      async save(records) {
+        persisted = JSON.parse(JSON.stringify(records)) as unknown[]
+      },
+    }
+
+    const firstMount = renderHook(() => useYarnInventory(repository))
+
+    await waitFor(() => {
+      expect(firstMount.result.current.isLoading).toBe(false)
+    })
+
+    const existing = firstMount.result.current.records[0]
+    expect(existing).toBeDefined()
+
+    await act(async () => {
+      await firstMount.result.current.updateRecordFromDraft(existing!.id, {
+        imageUrl: existing?.image?.url ?? '',
+        maker: existing!.maker,
+        yarnName: existing!.yarnName,
+        yardage: String(existing!.totalYardage ?? 0),
+        meters: String(existing!.totalMeters ?? 0),
+        grams: String(existing!.totalGrams ?? 0),
+        weightCategory: existing!.weightCategory,
+        materialType: existing!.materialType,
+        quantityInStock: String(existing!.quantityInStock),
+        handDyed: !existing!.handDyed,
+        superwash: !existing!.superwash,
+        archived: existing!.archived,
+      })
+    })
+
+    firstMount.unmount()
+
+    const secondMount = renderHook(() => useYarnInventory(repository))
+
+    await waitFor(() => {
+      expect(secondMount.result.current.isLoading).toBe(false)
+    })
+
+    const reloaded = secondMount.result.current.records.find(
+      (record) => record.id === existing!.id
+    )
+
+    expect(reloaded?.handDyed).toBe(!existing!.handDyed)
+    expect(reloaded?.superwash).toBe(!existing!.superwash)
+  })
 })

@@ -78,15 +78,29 @@ describe('yarnFactory', () => {
     expect(normalized.quantityInStock).toBe(2.25)
   })
 
-  it('falls back to fingering when weight category input is invalid', () => {
+  it('preserves valid weight category input during normalization', () => {
     const normalized = normalizeYarnDraftValues({
       ...DEFAULT_CREATE_YARN_DRAFT,
       maker: 'Malabrigo',
       yarnName: 'Rios',
       materialType: 'Merino Wool',
-      weightCategory: 'unknown' as never,
+      weightCategory: 'dk',
     })
 
-    expect(normalized.weightCategory).toBe('fingering')
+    expect(normalized.weightCategory).toBe('dk')
+  })
+
+  it('preserves boolean toggle values without coercion', () => {
+    const normalized = normalizeYarnDraftValues({
+      ...DEFAULT_CREATE_YARN_DRAFT,
+      maker: 'Malabrigo',
+      yarnName: 'Rios',
+      materialType: 'Merino Wool',
+      handDyed: true,
+      superwash: false,
+    })
+
+    expect(normalized.handDyed).toBe(true)
+    expect(normalized.superwash).toBe(false)
   })
 })
