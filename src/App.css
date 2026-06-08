@@ -103,6 +103,20 @@
   padding: 0.25rem 0.9rem;
 }
 
+.pill:focus-visible,
+.filters-select:focus-visible,
+.filters-panel input[type='checkbox']:focus-visible,
+.card-edit-button:focus-visible,
+.floating-add-button:focus-visible,
+.modal-close:focus-visible,
+.cancel-button:focus-visible,
+.submit-button:focus-visible,
+.input-group input:focus-visible,
+.input-group select:focus-visible {
+  outline: 2px solid #17171a;
+  outline-offset: 2px;
+}
+
 .pill.is-highlight {
   color: #fff;
   background: linear-gradient(115deg, #f55cbb, #ff9446);
@@ -187,7 +201,7 @@
   position: absolute;
   top: 0.65rem;
   left: 0.65rem;
-  /* z-index: 1; */
+  z-index: 1;
   border: 1px solid #cfcfd2;
   border-radius: 999px;
   background: #ffffff;

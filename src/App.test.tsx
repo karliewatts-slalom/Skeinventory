@@ -28,6 +28,143 @@ describe('App', () => {
     ).toBeInTheDocument()
   })
 
+  it('supports keyboard-only completion of primary inventory actions', async () => {
+    localStorage.clear()
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
+
+    const user = userEvent.setup()
+    render(<App />)
+
+    const addButton = await screen.findByRole('button', {
+      name: /add new skeinventory/i,
+    })
+    addButton.focus()
+    expect(addButton).toHaveFocus()
+    await user.keyboard('{Enter}')
+
+    expect(await screen.findByRole('dialog')).toBeInTheDocument()
+    await user.type(screen.getByLabelText(/^maker \*$/i), 'Keyboard Maker')
+    await user.type(screen.getByLabelText(/yarn name/i), 'Keyboard Yarn')
+    await user.type(screen.getByLabelText(/material type/i), 'Wool')
+
+    const addSkeinventoryButton = screen.getByRole('button', {
+      name: /add skeinventory/i,
+    })
+    addSkeinventoryButton.focus()
+    await user.keyboard('{Enter}')
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+
+    const searchInput = screen.getByLabelText(/search inventory/i)
+    searchInput.focus()
+    await user.keyboard('keyboard yarn')
+    expect(screen.getByRole('heading', { name: /keyboard yarn/i })).toBeInTheDocument()
+
+    const makerSelect = screen.getByLabelText(/select maker/i)
+    makerSelect.focus()
+    await user.selectOptions(makerSelect, 'Keyboard Maker')
+    expect(screen.getByRole('heading', { name: /keyboard yarn/i })).toBeInTheDocument()
+
+    const keyboardCard = screen
+      .getByRole('heading', { name: /keyboard yarn/i })
+      .closest('article')
+    expect(keyboardCard).not.toBeNull()
+
+    const archiveButton = within(keyboardCard as HTMLElement).getByRole('button', {
+      name: /archive/i,
+    })
+    archiveButton.focus()
+    await user.keyboard('{Enter}')
+
+    const inventoryViewToggle = screen.getByRole('group', {
+      name: /inventory view/i,
+    })
+    const archivedButton = within(inventoryViewToggle).getByRole('button', {
+      name: /archived/i,
+    })
+    archivedButton.focus()
+    await user.keyboard('{Enter}')
+
+    const archivedCard = await screen.findByRole('heading', {
+      name: /keyboard yarn/i,
+    })
+    const archivedCardContainer = archivedCard.closest('article')
+    expect(archivedCardContainer).not.toBeNull()
+
+    const editButton = within(archivedCardContainer as HTMLElement).getByRole('button', {
+      name: /edit/i,
+    })
+    editButton.focus()
+    await user.keyboard('{Enter}')
+
+    const materialInput = screen.getByLabelText(/material type/i)
+    materialInput.focus()
+    await user.keyboard('{Control>}a{/Control}Merino')
+    const saveButton = screen.getByRole('button', { name: /save changes/i })
+    saveButton.focus()
+    await user.keyboard('{Enter}')
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+
+    const restoredCardCandidate = screen
+      .getByRole('heading', { name: /keyboard yarn/i })
+      .closest('article')
+    expect(restoredCardCandidate).not.toBeNull()
+
+    const restoreButton = within(restoredCardCandidate as HTMLElement).getByRole('button', {
+      name: /restore/i,
+    })
+    restoreButton.focus()
+    await user.keyboard('{Enter}')
+
+    const activeButton = within(inventoryViewToggle).getByRole('button', {
+      name: /active/i,
+    })
+    activeButton.focus()
+    await user.keyboard('{Enter}')
+
+    const activeCard = await screen.findByRole('heading', { name: /keyboard yarn/i })
+    const activeCardContainer = activeCard.closest('article')
+    expect(activeCardContainer).not.toBeNull()
+
+    const deleteButton = within(activeCardContainer as HTMLElement).getByRole('button', {
+      name: /delete keyboard maker keyboard yarn/i,
+    })
+    deleteButton.focus()
+    await user.keyboard('{Enter}')
+
+    expect(confirmSpy).toHaveBeenCalled()
+    expect(screen.queryByRole('heading', { name: /keyboard yarn/i })).not.toBeInTheDocument()
+
+    confirmSpy.mockRestore()
+  })
+
+  it('keeps keyboard focus trapped within the modal dialog', async () => {
+    localStorage.clear()
+
+    const user = userEvent.setup()
+    render(<App />)
+
+    const addButton = await screen.findByRole('button', {
+      name: /add new skeinventory/i,
+    })
+    addButton.focus()
+    await user.keyboard('{Enter}')
+
+    const closeButton = await screen.findByRole('button', {
+      name: /close add yarn dialog/i,
+    })
+    const submitButton = screen.getByRole('button', {
+      name: /add skeinventory/i,
+    })
+
+    closeButton.focus()
+    await user.keyboard('{Shift>}{Tab}{/Shift}')
+    expect(submitButton).toHaveFocus()
+
+    await user.keyboard('{Tab}')
+    expect(closeButton).toHaveFocus()
+  })
+
   it('prevents invalid submit and shows inline errors', async () => {
     const user = userEvent.setup()
     render(<App />)
