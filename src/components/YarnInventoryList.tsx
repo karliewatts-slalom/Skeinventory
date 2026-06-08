@@ -4,6 +4,7 @@ interface YarnInventoryListProps {
   records: Yarn[]
   isLoading: boolean
   onEdit: (record: Yarn) => void
+  onArchive: (recordId: string) => void
 }
 
 const formatQuantity = (value: number): string =>
@@ -27,6 +28,7 @@ export const YarnInventoryList = ({
   records,
   isLoading,
   onEdit,
+  onArchive,
 }: YarnInventoryListProps) => {
   if (isLoading) {
     return <p className="inventory-state">Loading inventory...</p>
@@ -48,6 +50,12 @@ export const YarnInventoryList = ({
           className={`inventory-card ${record.archived ? 'is-archived' : ''}`}
           key={record.id}
         >
+          {record.archived && (
+            <span className="archived-pill" aria-label="Archived">
+              Archived
+            </span>
+          )}
+
           {record.imageUrl ? (
             <img
               className="card-image"
@@ -97,6 +105,15 @@ export const YarnInventoryList = ({
             >
               Edit
             </button>
+            {!record.archived && (
+              <button
+                type="button"
+                className="card-edit-button"
+                onClick={() => onArchive(record.id)}
+              >
+                Archive
+              </button>
+            )}
           </div>
         </article>
       ))}

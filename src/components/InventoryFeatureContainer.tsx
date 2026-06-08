@@ -12,6 +12,7 @@ export const InventoryFeatureContainer = () => {
     isLoading,
     createRecordFromDraft,
     updateRecordFromDraft,
+    archiveRecord,
   } = useYarnInventory()
   const {
     isOpen,
@@ -47,9 +48,12 @@ export const InventoryFeatureContainer = () => {
             </p>
           )}
           <YarnInventoryList
-            records={records}
+            records={records.filter((record) => !record.archived)}
             isLoading={isLoading}
             onEdit={openEdit}
+            onArchive={(recordId) => {
+              void archiveRecord(recordId)
+            }}
           />
         </main>
       </div>

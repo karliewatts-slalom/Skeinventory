@@ -153,4 +153,46 @@ describe('useYarnInventory persistence', () => {
     expect(hook.result.current.statusMessage).toBeNull()
     expect(hook.result.current.records).toEqual(before)
   })
+
+  it('archives an active record and persists the archived flag across reloads', async () => {
+    let persisted: unknown[] = []
+
+    const repository: InventoryRepository = {
+      async load() {
+        return persisted as never
+      },
+      async save(records) {
+        persisted = JSON.parse(JSON.stringify(records)) as unknown[]
+      },
+    }
+
+    const firstMount = renderHook(() => useYarnInventory(repository))
+
+    await waitFor(() => {
+      expect(firstMount.result.current.isLoading).toBe(false)
+    })
+
+    const existingActive = firstMount.result.current.records.find(
+      (record) => !record.archived
+    )
+    expect(existingActive).toBeDefined()
+
+    await act(async () => {
+      await firstMount.result.current.archiveRecord(existingActive!.id)
+    })
+
+    firstMount.unmount()
+
+    const secondMount = renderHook(() => useYarnInventory(repository))
+
+    await waitFor(() => {
+      expect(secondMount.result.current.isLoading).toBe(false)
+    })
+
+    const reloaded = secondMount.result.current.records.find(
+      (record) => record.id === existingActive!.id
+    )
+
+    expect(reloaded?.archived).toBe(true)
+  })
 })

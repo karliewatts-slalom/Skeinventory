@@ -108,13 +108,13 @@ describe('App', () => {
       name: /yarn inventory list/i,
     })
 
-    const woolEaseCard = within(inventoryList)
-      .getByRole('heading', { name: /wool-ease/i })
+    const riosCard = within(inventoryList)
+      .getByRole('heading', { name: /rios/i })
       .closest('article')
-    expect(woolEaseCard).not.toBeNull()
+    expect(riosCard).not.toBeNull()
 
     await user.click(
-      within(woolEaseCard as HTMLElement).getByRole('button', {
+      within(riosCard as HTMLElement).getByRole('button', {
         name: /edit/i,
       })
     )
@@ -126,7 +126,7 @@ describe('App', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
 
     const updatedCard = within(inventoryList)
-      .getByRole('heading', { name: /wool-ease/i })
+      .getByRole('heading', { name: /rios/i })
       .closest('article')
     expect(updatedCard).not.toBeNull()
     expect(
@@ -168,13 +168,13 @@ describe('App', () => {
       name: /yarn inventory list/i,
     })
 
-    const woolEaseCard = within(inventoryList)
-      .getByRole('heading', { name: /wool-ease/i })
+    const riosCard = within(inventoryList)
+      .getByRole('heading', { name: /rios/i })
       .closest('article')
-    expect(woolEaseCard).not.toBeNull()
+    expect(riosCard).not.toBeNull()
 
     await user.click(
-      within(woolEaseCard as HTMLElement).getByRole('button', {
+      within(riosCard as HTMLElement).getByRole('button', {
         name: /edit/i,
       })
     )
@@ -190,7 +190,7 @@ describe('App', () => {
     ).toBeInTheDocument()
   })
 
-  it('persists and renders edited hand dyed and superwash states', async () => {
+  it('persists edited hand dyed and superwash states', async () => {
     localStorage.clear()
 
     const user = userEvent.setup()
@@ -200,13 +200,13 @@ describe('App', () => {
       name: /yarn inventory list/i,
     })
 
-    const woolEaseHeading = within(inventoryList).getByRole('heading', {
-      name: /wool-ease/i,
+    const riosHeading = within(inventoryList).getByRole('heading', {
+      name: /rios/i,
     })
-    const woolEaseCard = woolEaseHeading.closest('article')
-    expect(woolEaseCard).not.toBeNull()
+    const riosCard = riosHeading.closest('article')
+    expect(riosCard).not.toBeNull()
 
-    const editButton = within(woolEaseCard as HTMLElement).getByRole('button', {
+    const editButton = within(riosCard as HTMLElement).getByRole('button', {
       name: /edit/i,
     })
     await user.click(editButton)
@@ -217,18 +217,41 @@ describe('App', () => {
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
 
-    const updatedWoolEaseCard = within(inventoryList)
-      .getByRole('heading', { name: /wool-ease/i })
+    const updatedRiosCard = within(inventoryList)
+      .getByRole('heading', { name: /rios/i })
       .closest('article')
-    expect(updatedWoolEaseCard).not.toBeNull()
+    expect(updatedRiosCard).not.toBeNull()
     expect(
-      within(updatedWoolEaseCard as HTMLElement).getByText('Hand Dyed')
-    ).toBeInTheDocument()
+      within(updatedRiosCard as HTMLElement).queryByText('Hand Dyed')
+    ).not.toBeInTheDocument()
     expect(
-      within(updatedWoolEaseCard as HTMLElement).getByText('Superwash')
-    ).toBeInTheDocument()
+      within(updatedRiosCard as HTMLElement).queryByText('Superwash')
+    ).not.toBeInTheDocument()
     expect(screen.getByRole('status')).toHaveTextContent(
       /updated successfully/i
     )
+  })
+
+  it('archives an active record and removes it from the default list', async () => {
+    localStorage.clear()
+
+    const user = userEvent.setup()
+    render(<App />)
+
+    const inventoryList = await screen.findByRole('region', {
+      name: /yarn inventory list/i,
+    })
+
+    const riosCard = within(inventoryList)
+      .getByRole('heading', { name: /rios/i })
+      .closest('article')
+    expect(riosCard).not.toBeNull()
+
+    await user.click(
+      within(riosCard as HTMLElement).getByRole('button', { name: /archive/i })
+    )
+
+    expect(screen.queryByRole('heading', { name: /rios/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent(/archived successfully/i)
   })
 })

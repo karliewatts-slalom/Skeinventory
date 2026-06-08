@@ -20,6 +20,7 @@ interface UseYarnInventoryResult {
     id: string,
     draft: CreateYarnDraft
   ) => Promise<boolean>
+  archiveRecord: (id: string) => Promise<boolean>
 }
 
 export const useYarnInventory = (
@@ -125,6 +126,31 @@ export const useYarnInventory = (
     }
   }
 
+  const archiveRecord = async (id: string): Promise<boolean> => {
+    setOperationError(null)
+    setStatusMessage(null)
+
+    const nextRecords = records.map((record) =>
+      record.id === id
+        ? {
+            ...record,
+            archived: true,
+            updatedAt: new Date().toISOString(),
+          }
+        : record
+    )
+
+    try {
+      await repository.save(nextRecords)
+      setRecords(nextRecords)
+      setStatusMessage('Yarn record archived successfully.')
+      return true
+    } catch {
+      setOperationError('Archiving failed. Please try again.')
+      return false
+    }
+  }
+
   return {
     records,
     isLoading,
@@ -132,5 +158,6 @@ export const useYarnInventory = (
     statusMessage,
     createRecordFromDraft,
     updateRecordFromDraft,
+    archiveRecord,
   }
 }

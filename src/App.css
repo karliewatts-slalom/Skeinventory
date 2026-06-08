@@ -109,11 +109,26 @@
 }
 
 .inventory-card {
+  position: relative;
   border-radius: 0.85rem;
   border: 1px solid #cfcfd2;
   background: #f3f3f4;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.archived-pill {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  z-index: 1;
+  border-radius: 999px;
+  background: #6f6f86;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 0.2rem 0.55rem;
 }
 
 .inventory-card.is-archived {
@@ -199,6 +214,7 @@
 
 .card-edit-button {
   margin-top: 0.75rem;
+  margin-right: 0.5rem;
   border: 1px solid #cfcfd2;
   border-radius: 0.5rem;
   background: #ffffff;
