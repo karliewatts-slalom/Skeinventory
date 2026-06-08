@@ -254,4 +254,48 @@ describe('App', () => {
     expect(screen.queryByRole('heading', { name: /rios/i })).not.toBeInTheDocument()
     expect(screen.getByRole('status')).toHaveTextContent(/archived successfully/i)
   })
+
+  it('restores an archived record and returns it to the active list', async () => {
+    localStorage.clear()
+
+    const user = userEvent.setup()
+    render(<App />)
+
+    const inventoryViewToggle = screen.getByRole('group', {
+      name: /inventory view/i,
+    })
+    await user.click(
+      within(inventoryViewToggle).getByRole('button', { name: /archived/i })
+    )
+
+    const inventoryList = await screen.findByRole('region', {
+      name: /yarn inventory list/i,
+    })
+
+    const woolEaseCard = within(inventoryList)
+      .getByRole('heading', { name: /wool-ease/i })
+      .closest('article')
+    expect(woolEaseCard).not.toBeNull()
+    expect(
+      within(woolEaseCard as HTMLElement).getByLabelText(/archived/i)
+    ).toBeInTheDocument()
+
+    await user.click(
+      within(woolEaseCard as HTMLElement).getByRole('button', {
+        name: /restore/i,
+      })
+    )
+
+    expect(
+      screen.queryByRole('heading', { name: /wool-ease/i })
+    ).not.toBeInTheDocument()
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      /restored successfully/i
+    )
+
+    await user.click(
+      within(inventoryViewToggle).getByRole('button', { name: /active/i })
+    )
+    expect(screen.getByRole('heading', { name: /wool-ease/i })).toBeInTheDocument()
+  })
 })

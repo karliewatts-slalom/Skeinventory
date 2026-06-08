@@ -102,6 +102,12 @@
   padding: 0.65rem 0.75rem;
 }
 
+.view-toggle {
+  display: flex;
+  gap: 0.6rem;
+  margin: 0 0 1.1rem;
+}
+
 .inventory-grid {
   display: grid;
   gap: 2rem;

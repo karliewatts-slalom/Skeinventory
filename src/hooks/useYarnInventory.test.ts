@@ -195,4 +195,83 @@ describe('useYarnInventory persistence', () => {
 
     expect(reloaded?.archived).toBe(true)
   })
+
+  it('restores an archived record and persists the active flag across reloads', async () => {
+    let persisted: unknown[] = []
+
+    const repository: InventoryRepository = {
+      async load() {
+        return persisted as never
+      },
+      async save(records) {
+        persisted = JSON.parse(JSON.stringify(records)) as unknown[]
+      },
+    }
+
+    const firstMount = renderHook(() => useYarnInventory(repository))
+
+    await waitFor(() => {
+      expect(firstMount.result.current.isLoading).toBe(false)
+    })
+
+    const existingArchived = firstMount.result.current.records.find(
+      (record) => record.archived
+    )
+    expect(existingArchived).toBeDefined()
+
+    await act(async () => {
+      await firstMount.result.current.restoreRecord(existingArchived!.id)
+    })
+
+    firstMount.unmount()
+
+    const secondMount = renderHook(() => useYarnInventory(repository))
+
+    await waitFor(() => {
+      expect(secondMount.result.current.isLoading).toBe(false)
+    })
+
+    const reloaded = secondMount.result.current.records.find(
+      (record) => record.id === existingArchived!.id
+    )
+
+    expect(reloaded?.archived).toBe(false)
+  })
+
+  it('keeps existing data unchanged and exposes clear error when restore save fails', async () => {
+    const repository: InventoryRepository = {
+      async load() {
+        return [] as never
+      },
+      async save() {
+        throw new Error('write failed')
+      },
+    }
+
+    const hook = renderHook(() => useYarnInventory(repository))
+
+    await waitFor(() => {
+      expect(hook.result.current.isLoading).toBe(false)
+    })
+
+    const existingArchived = hook.result.current.records.find(
+      (record) => record.archived
+    )
+    expect(existingArchived).toBeDefined()
+
+    const before = JSON.parse(
+      JSON.stringify(hook.result.current.records)
+    ) as typeof hook.result.current.records
+
+    let result = false
+
+    await act(async () => {
+      result = await hook.result.current.restoreRecord(existingArchived!.id)
+    })
+
+    expect(result).toBe(false)
+    expect(hook.result.current.operationError).toBe('Restoring failed. Please try again.')
+    expect(hook.result.current.statusMessage).toBeNull()
+    expect(hook.result.current.records).toEqual(before)
+  })
 })
