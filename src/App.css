@@ -1,17 +1,371 @@
 .app-shell {
-  max-width: 48rem;
-  margin: 3rem auto;
-  padding: 0 1.25rem;
+  min-height: 100vh;
+  background: #efefef;
+  color: #17171a;
 }
 
-.app-shell h1 {
-  margin: 0 0 0.75rem;
-  font-size: 2rem;
-  line-height: 1.2;
+.app-header {
+  border-bottom: 1px solid #d1d1d4;
+  padding: 2rem 2.75rem 1.5rem;
+  background: #f5f5f5;
 }
 
-.app-shell p {
+.app-header h1 {
   margin: 0;
-  line-height: 1.5;
-  color: #354255;
+  font-family: 'Brush Script MT', 'Segoe Script', cursive;
+  color: #ea5ab4;
+  font-size: 3.45rem;
+  line-height: 0.9;
+}
+
+.app-body {
+  display: grid;
+  grid-template-columns: 22rem 1fr;
+}
+
+.filters-panel {
+  border-right: 1px solid #c8c8cb;
+  padding: 2rem;
+  background: #ececec;
+}
+
+.filters-panel h2,
+.filters-panel h3,
+.filters-panel h4 {
+  margin: 0 0 0.8rem;
+}
+
+.filters-panel h2 {
+  font-size: 1rem;
+  margin-bottom: 1.6rem;
+}
+
+.filters-panel h3,
+.filters-panel h4 {
+  font-size: 0.95rem;
+  margin-top: 2rem;
+}
+
+.filters-panel ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.filters-panel li {
+  margin-bottom: 0.75rem;
+}
+
+.filters-panel label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1rem;
+}
+
+.filters-panel input[type='checkbox'] {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+.pill-row {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.pill {
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  background: #d8d8dc;
+  color: #17171a;
+  padding: 0.25rem 0.9rem;
+}
+
+.pill.is-highlight {
+  color: #fff;
+  background: linear-gradient(115deg, #f55cbb, #ff9446);
+}
+
+.inventory-area {
+  padding: 2.8rem;
+  min-height: calc(100vh - 8.5rem);
+}
+
+.status-message {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  background: #e8fff0;
+  color: #136337;
+  border-radius: 0.5rem;
+  padding: 0.65rem 0.75rem;
+}
+
+.inventory-grid {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
+}
+
+.inventory-card {
+  border-radius: 0.85rem;
+  border: 1px solid #cfcfd2;
+  background: #f3f3f4;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.inventory-card.is-archived {
+  opacity: 0.65;
+}
+
+.card-image {
+  height: 12rem;
+  background: linear-gradient(130deg, #ebe2f5, #f8e8de);
+  color: #827f91;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.76rem;
+}
+
+.card-content {
+  padding: 1.2rem;
+}
+
+.card-maker {
+  margin: 0;
+  color: #6f6f86;
+}
+
+.card-content h3 {
+  margin: 0.1rem 0 0.85rem;
+  font-size: 1.95rem;
+}
+
+.badge-row {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.9rem;
+}
+
+.badge {
+  border-radius: 999px;
+  padding: 0.22rem 0.7rem;
+  font-size: 0.88rem;
+}
+
+.badge-pink {
+  background: #f0dcea;
+}
+
+.badge-purple {
+  background: #dfd7eb;
+}
+
+.badge-sand {
+  background: #ebddd4;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.stat-label {
+  margin: 0;
+  color: #6f6f86;
+}
+
+.stats-grid p {
+  margin: 0;
+}
+
+.totals-row {
+  margin: 0.95rem 0 0;
+  color: #65657b;
+}
+
+.inventory-state {
+  font-size: 1rem;
+  color: #595975;
+}
+
+.floating-add-button {
+  position: fixed;
+  right: 2.25rem;
+  bottom: 1.75rem;
+  border: none;
+  border-radius: 999px;
+  padding: 0.9rem 2rem;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  background: linear-gradient(112deg, #ee56c0, #fc9b43);
+  box-shadow: 0 8px 24px rgba(62, 37, 49, 0.3);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal-dialog {
+  width: min(58rem, 100%);
+  max-height: 95vh;
+  background: #f5f5f6;
+  border-radius: 0.85rem;
+  overflow: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem 1.8rem;
+  border-bottom: 1px solid #d6d6d9;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.95rem;
+}
+
+.modal-close {
+  border: none;
+  background: transparent;
+  font-size: 2rem;
+  line-height: 1;
+  color: #7c7c8f;
+}
+
+.modal-form {
+  padding: 1.4rem 1.8rem 1.8rem;
+}
+
+.input-group {
+  margin-bottom: 1rem;
+}
+
+.input-group label {
+  font-size: 1.05rem;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+.input-group input,
+.input-group select {
+  width: 100%;
+  font-size: 1rem;
+  border: 1px solid #cfd0d5;
+  border-radius: 0.55rem;
+  background: #efeff2;
+  padding: 0.7rem 0.8rem;
+}
+
+.input-group input[aria-invalid='true'],
+.input-group select[aria-invalid='true'] {
+  border-color: #bf2f54;
+}
+
+.grid-two,
+.grid-three {
+  display: grid;
+  gap: 1rem;
+}
+
+.grid-two {
+  grid-template-columns: 1fr 1fr;
+}
+
+.grid-three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.upload-box {
+  margin-top: 0.6rem;
+  border: 2px dashed #d3d4d8;
+  border-radius: 0.7rem;
+  text-align: center;
+  padding: 1rem;
+  color: #6e6e84;
+}
+
+.upload-box p {
+  margin: 0.2rem 0;
+}
+
+.checkbox-group {
+  display: grid;
+  gap: 0.45rem;
+  margin: 1rem 0;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.field-error,
+.submit-error {
+  margin: 0.35rem 0 0;
+  color: #bf2f54;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.35rem;
+}
+
+.cancel-button,
+.submit-button {
+  border-radius: 0.65rem;
+  font-size: 1.1rem;
+  padding: 0.7rem 1.25rem;
+}
+
+.cancel-button {
+  border: 1px solid #d1d1d6;
+  background: #f3f3f4;
+}
+
+.submit-button {
+  border: none;
+  color: #fff;
+  background: linear-gradient(112deg, #ee56c0, #fc9b43);
+}
+
+@media (max-width: 1080px) {
+  .app-body {
+    grid-template-columns: 1fr;
+  }
+
+  .filters-panel {
+    border-right: none;
+    border-bottom: 1px solid #c8c8cb;
+  }
+
+  .grid-two,
+  .grid-three {
+    grid-template-columns: 1fr;
+  }
+
+  .floating-add-button {
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+  }
 }
